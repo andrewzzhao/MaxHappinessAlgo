@@ -27,10 +27,7 @@ def solve(G, s):
         G_happy = G.copy()
         while nx.number_of_nodes(G_happy) > k:  
             # sort edges by decreasing happiness
-            print(k)
-            
             sorted_happiness = sorted(G_happy.edges(data=True), key=lambda y: (y[2]["happiness"], -y[2]["stress"]), reverse=True)
-            print(sorted_happiness)
             if len(sorted_happiness) == 0:
                 break
             #need to merge nodes A and B
@@ -123,10 +120,7 @@ if __name__ == '__main__':
     print(D)
     print(k)
     print("Total Happiness: {}".format(calculate_happiness(D, G)))
-    their_D = read_output_file('samples/10.out', G, s)
-    print(their_D)
-    print(calculate_happiness(their_D, G))
-    #write_output_file(D, 'out/test.out')
+    write_output_file(D, 'inputs-outputs/50.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
