@@ -2,8 +2,8 @@ import random
 import networkx as nx
 from parse import write_input_file
 
-maxStress = 89.69
-numPeople = 50
+maxStress = 99.69
+numPeople = 10
 '''
 inputs = [[-1 for _ in range(numPeople)] for _ in range(numPeople)]
 
@@ -20,6 +20,6 @@ for i in range(numPeople):
         print(prev_edge)
         """
         G[i][j]["happiness"] = round(random.uniform(20,100), 3)
-        G[i][j]["stress"] = round(random.uniform(0.1,10), 3)
+        G[i][j]["stress"] = round(random.uniform(10,70), 3)
         
-write_input_file(G, maxStress, "inputs-outputs/50.in")
+write_input_file(G, maxStress, "backup/10.in")

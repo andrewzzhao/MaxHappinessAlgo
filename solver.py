@@ -120,7 +120,7 @@ if __name__ == '__main__':
     print(D)
     print(k)
     print("Total Happiness: {}".format(calculate_happiness(D, G)))
-    write_output_file(D, 'inputs-outputs/50.out')
+    write_output_file(D, 'backup/10.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
