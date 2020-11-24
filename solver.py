@@ -1,6 +1,6 @@
 import networkx as nx
-from parse import read_input_file, write_output_file
-from utils import is_valid_solution, calculate_happiness
+from parse import read_input_file, write_output_file, read_output_file
+from utils import is_valid_solution, calculate_happiness, convert_dictionary
 from operator import itemgetter
 import sys
 
@@ -16,48 +16,69 @@ def solve(G, s):
     """
 
     # TODO: your code here!
-
-    G_checker = G.copy()
     best_D_so_far = {}
     best_k_so_far = 1
     best_H_so_far = 0.0
     n = nx.number_of_nodes(G)
+    
     for k in range(1, n + 1):
         curr_D = {}
-        while len(curr_D) < n:  
+        smax = s/k
+        G_happy = G.copy()
+        while nx.number_of_nodes(G_happy) > k:  
             # sort edges by decreasing happiness
-            G_happy = G.copy()
-            sorted_happiness = sorted(G_happy.edges(data=True), key=itemgetter(0), reverse=True)
+            print(k)
+            
+            sorted_happiness = sorted(G_happy.edges(data=True), key=lambda y: (y[2]["happiness"], -y[2]["stress"]), reverse=True)
+            print(sorted_happiness)
+            if len(sorted_happiness) == 0:
+                break
             #need to merge nodes A and B
-            a, b = sorted_happiness[0]
+            n1, n2, _ = sorted_happiness[0]
+            if G_happy.nodes[n1].get("stress", 0) + G_happy.nodes[n2].get("stress", 0) + G_happy.edges[n1, n2]["stress"] <= smax:
+                merge(G_happy, n1, n2)
+                
+            else:
+                G_happy.remove_edge(n1,n2)
+                
 
-
-        
-        if is_valid_solution(curr_D, G_checker, s, k):
-            if calculate_happiness(curr_D, G_checker) > best_H_so_far:
+        if nx.number_of_nodes(G_happy) == k:
+            room = 0
+            for node in list(G_happy.nodes):
+                if isinstance(node, int):
+                    temp = [node]
+                else:
+                    temp = node.split(' ')
+                    temp = [int(x) for x in temp]
+                curr_D[room] = temp
+                room += 1
+            curr_D = convert_dictionary(curr_D)
+            
+        else:
+            continue
+       
+        if is_valid_solution(curr_D, G, s, k):
+            if calculate_happiness(curr_D, G) > best_H_so_far:
                 best_D_so_far = curr_D
                 best_k_so_far = k
-
-        
-
-
+                best_H_so_far = calculate_happiness(curr_D, G)
             #
     # pass
     return best_D_so_far, best_k_so_far
 
 def merge(G, n1, n2):
-    # Get all predecessors and successors of two node
+    
     neighbors = nx.common_neighbors(G, n1, n2)
-    # Create the new node with combined name ---- list(<iterator>), or iterator.next
-    name = str(n1) + '/' + str(n2)
+    # Create the new node with combined name
+    name = str(n1) + ' ' + str(n2)
     G.add_node(name)
-    G.nodes[name]["happiness"] = (G.nodes[n1].get("happiness", 0) + G.nodes[n2].get("happiness", 0))
-    G.nodes[name]["stress"] = (G.nodes[n1].get("stress", 0) + G.nodes[n2].get("stress", 0))
+    #nx.set_node_attributes(G, values, name=None)
+    G.nodes[name]["happiness"] = G.nodes[n1].get("happiness", 0) + G.nodes[n2].get("happiness", 0) + G.edges[n1, n2]["happiness"]
+    G.nodes[name]["stress"] = G.nodes[n1].get("stress", 0) + G.nodes[n2].get("stress", 0) + G.edges[n1, n2]["stress"]
 
 
-
-    G.add_edges([(p, name) for p in neighbors])
     for p in neighbors:
+        G.add_edge(p,name)
         G[p][name]["happiness"] = G[p][n1]["happiness"] + G[p][n2]["happiness"]
         G[p][name]["stress"] = G[p][n1]["stress"] + G[p][n2]["stress"]
        
@@ -74,7 +95,8 @@ def merge(G, n1, n2):
 
 
 
-    #my.pp[name] = "big"
+    #name = "Andrew"
+    #my.pp[name] = "smol compared to eiffel tower big compared to a water bottle made for ants that are 6 feet tall"
     #len(pp.extend(simp.get("Andrew")) = 1 
     #len(simp.get("Andrew").pp) == -1 * sys.maxint -> TRUE
     #print("gimmeee one.. gimme twooo seconds" + "- kdrama simp")
@@ -92,14 +114,19 @@ def merge(G, n1, n2):
 
 # Usage: python3 solver.py test.in
 
-# if __name__ == '__main__':
-#     assert len(sys.argv) == 2
-#     path = sys.argv[1]
-#     G, s = read_input_file(path)
-#     D, k = solve(G, s)
-#     assert is_valid_solution(D, G, s, k)
-#     print("Total Happiness: {}".format(calculate_happiness(D, G)))
-#     write_output_file(D, 'out/test.out')
+if __name__ == '__main__':
+    assert len(sys.argv) == 2
+    path = sys.argv[1]
+    G, s = read_input_file(path)
+    D, k = solve(G, s)
+    assert is_valid_solution(D, G, s, k)
+    print(D)
+    print(k)
+    print("Total Happiness: {}".format(calculate_happiness(D, G)))
+    their_D = read_output_file('samples/10.out', G, s)
+    print(their_D)
+    print(calculate_happiness(their_D, G))
+    #write_output_file(D, 'out/test.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
