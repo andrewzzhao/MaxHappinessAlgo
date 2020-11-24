@@ -6,15 +6,15 @@ from ortools.linear_solver import pywraplp
 def create_data_model():
     """Create the data for the example."""
     data = {}
-    weights = [48, 30, 42, 36, 36, 48, 42, 42, 36, 24, 30, 30, 42, 36, 36]
-    values = [10, 30, 25, 50, 35, 30, 15, 40, 30, 35, 45, 10, 20, 30, 25]
+    weights = [48, 30, 42, 36, 36, 48, 42, 42, 36, 24, 30, 30, 42, 36, 36, 48, 30, 42, 36, 36, 48, 42, 42, 36, 24, 30, 30, 42, 36, 36] * 2
+    values = [10, 30, 25, 50, 35, 30, 15, 40, 30, 35, 45, 10, 20, 30, 25, 10, 30, 25, 50, 35, 30, 15, 40, 30, 35, 45, 10, 20, 30, 25] * 2
     data['weights'] = weights
     data['values'] = values
     data['items'] = list(range(len(weights)))
     data['num_items'] = len(weights)
-    num_bins = 5
+    num_bins = 20
     data['bins'] = list(range(num_bins))
-    data['bin_capacities'] = [100, 100, 100, 100, 100]
+    data['bin_capacities'] = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100] * 2
     return data
 
 
