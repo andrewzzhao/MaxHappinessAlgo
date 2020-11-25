@@ -1,4 +1,6 @@
 import networkx as nx
+import numpy as np
+import random
 from parse import read_input_file, write_output_file, read_output_file
 from utils import is_valid_solution, calculate_happiness, convert_dictionary
 from operator import itemgetter
@@ -63,6 +65,29 @@ def solve(G, s):
     # pass
     return best_D_so_far, best_k_so_far
 
+def solve_kinda(G,s,n=10):
+    curMax = 0
+    dMax, kMax = 0,0
+    for i in range(n):
+        print("ITERATION", i)
+        d1, k1 = solve_happy(G,s)
+        d2, k2 = solve_stress(G,s)
+        h1 = calculate_happiness(d1, G)
+        h2 = calculate_happiness(d2, G)
+        if max(h1, h2) >  curMax:
+            print("NEW MAX YEY", max(h1, h2))
+            if h1 > h2:
+                curMax = h1
+                dMax, kMax = d1, k1 
+            else:
+                print("WOWOWOWOWOWOWOWOWOWOWWOW")
+                curMax = h2 
+                dMax, kMax = d2, k2
+    return dMax, kMax
+
+
+
+
 def solve_happy(G, s):
     """
     Args:
@@ -84,12 +109,15 @@ def solve_happy(G, s):
         smax = s/k
         G_happy = G.copy()
         while nx.number_of_nodes(G_happy) > k:  
+            i = np.random.geometric(p=0.10, size = 1).item(0)
             # sort edges by decreasing happiness
             sorted_happiness = sorted(G_happy.edges(data=True), key=lambda y: (y[2]["happiness"], -y[2]["stress"]), reverse=True)
+            #i = random.randint(0, len(sorted_happiness))
             if len(sorted_happiness) == 0:
                 break
             #need to merge nodes A and B
-            n1, n2, _ = sorted_happiness[0]
+            i = i % len(sorted_happiness)
+            n1, n2, _ = sorted_happiness[i]
             if G_happy.nodes[n1].get("stress", 0) + G_happy.nodes[n2].get("stress", 0) + G_happy.edges[n1, n2]["stress"] <= smax:
                 merge(G_happy, n1, n2)
                 
@@ -143,11 +171,13 @@ def solve_stress(G, s):
         G_stress = G.copy()
         while nx.number_of_nodes(G_stress) > k:  
             # sort edges by decreasing happiness
+            i = np.random.geometric(p=0.2, size = 1).item(0)
             sorted_stress = sorted(G_stress.edges(data=True), key=lambda y: (y[2]["stress"], -y[2]["happiness"]), reverse=False)
             if len(sorted_stress) == 0:
                 break
             #need to merge nodes A and B
-            n1, n2, _ = sorted_stress[0]
+            i = i % len(sorted_stress)
+            n1, n2, _ = sorted_stress[i]
             if G_stress.nodes[n1].get("stress", 0) + G_stress.nodes[n2].get("stress", 0) + G_stress.edges[n1, n2]["stress"] <= smax:
                 merge(G_stress, n1, n2)
                 
@@ -231,12 +261,12 @@ if __name__ == '__main__':
     assert len(sys.argv) == 2
     path = sys.argv[1]
     G, s = read_input_file(path)
-    D, k = solve_stress(G, s)
+    D, k = solve_kinda(G, s, 100)
     assert is_valid_solution(D, G, s, k)
     print(D)
     print(k)
     print("Total Happiness: {}".format(calculate_happiness(D, G)))
-    #write_output_file(D, 'backup/10.out')
+    write_output_file(D, 'backup/50.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
