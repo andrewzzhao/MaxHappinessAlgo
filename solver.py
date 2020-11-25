@@ -24,24 +24,24 @@ def solve(G, s):
     for k in range(1, n + 1):
         curr_D = {}
         smax = s/k
-        G_happy = G.copy()
-        while nx.number_of_nodes(G_happy) > k:  
+        G_stress = G.copy()
+        while nx.number_of_nodes(G_stress) > k:  
             # sort edges by decreasing happiness
-            sorted_happiness = sorted(G_happy.edges(data=True), key=lambda y: (y[2]["happiness"], -y[2]["stress"]), reverse=True)
-            if len(sorted_happiness) == 0:
+            sorted_stress = sorted(G_stress.edges(data=True), key=lambda y: (y[2]["stress"], -y[2]["happiness"]), reverse=False)
+            if len(sorted_stress) == 0:
                 break
             #need to merge nodes A and B
-            n1, n2, _ = sorted_happiness[0]
-            if G_happy.nodes[n1].get("stress", 0) + G_happy.nodes[n2].get("stress", 0) + G_happy.edges[n1, n2]["stress"] <= smax:
-                merge(G_happy, n1, n2)
+            n1, n2, _ = sorted_stress[0]
+            if G_stress.nodes[n1].get("stress", 0) + G_stress.nodes[n2].get("stress", 0) + G_stress.edges[n1, n2]["stress"] <= smax:
+                merge(G_stress, n1, n2)
                 
             else:
-                G_happy.remove_edge(n1,n2)
+                G_stress.remove_edge(n1,n2)
                 
 
-        if nx.number_of_nodes(G_happy) == k:
+        if nx.number_of_nodes(G_stress) == k:
             room = 0
-            for node in list(G_happy.nodes):
+            for node in list(G_stress.nodes):
                 if isinstance(node, int):
                     temp = [node]
                 else:
@@ -62,10 +62,6 @@ def solve(G, s):
             #
     # pass
     return best_D_so_far, best_k_so_far
-
-def solve_kinda(G, s):
-    def helper(G)
-
 
 def solve_happy(G, s):
     """
@@ -159,9 +155,9 @@ def solve_stress(G, s):
                 G_stress.remove_edge(n1,n2)
                 
 
-        if nx.number_of_nodes(G_happy) == k:
+        if nx.number_of_nodes(G_stress) == k:
             room = 0
-            for node in list(G_happy.nodes):
+            for node in list(G_stress.nodes):
                 if isinstance(node, int):
                     temp = [node]
                 else:
@@ -235,12 +231,12 @@ if __name__ == '__main__':
     assert len(sys.argv) == 2
     path = sys.argv[1]
     G, s = read_input_file(path)
-    D, k = solve(G, s)
+    D, k = solve_stress(G, s)
     assert is_valid_solution(D, G, s, k)
     print(D)
     print(k)
     print("Total Happiness: {}".format(calculate_happiness(D, G)))
-    write_output_file(D, 'backup/10.out')
+    #write_output_file(D, 'backup/10.out')
 
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
