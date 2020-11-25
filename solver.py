@@ -63,6 +63,126 @@ def solve(G, s):
     # pass
     return best_D_so_far, best_k_so_far
 
+def solve_kinda(G, s):
+    def helper(G)
+
+
+def solve_happy(G, s):
+    """
+    Args:
+        G: networkx.Graph
+        s: stress_budget
+    Returns:
+        D: Dictionary mapping for student to breakout room r e.g. {0:2, 1:0, 2:1, 3:2}
+        k: Number of breakout rooms
+    """
+
+    # TODO: your code here!
+    best_D_so_far = {}
+    best_k_so_far = 1
+    best_H_so_far = 0.0
+    n = nx.number_of_nodes(G)
+    
+    for k in range(1, n + 1):
+        curr_D = {}
+        smax = s/k
+        G_happy = G.copy()
+        while nx.number_of_nodes(G_happy) > k:  
+            # sort edges by decreasing happiness
+            sorted_happiness = sorted(G_happy.edges(data=True), key=lambda y: (y[2]["happiness"], -y[2]["stress"]), reverse=True)
+            if len(sorted_happiness) == 0:
+                break
+            #need to merge nodes A and B
+            n1, n2, _ = sorted_happiness[0]
+            if G_happy.nodes[n1].get("stress", 0) + G_happy.nodes[n2].get("stress", 0) + G_happy.edges[n1, n2]["stress"] <= smax:
+                merge(G_happy, n1, n2)
+                
+            else:
+                G_happy.remove_edge(n1,n2)
+                
+
+        if nx.number_of_nodes(G_happy) == k:
+            room = 0
+            for node in list(G_happy.nodes):
+                if isinstance(node, int):
+                    temp = [node]
+                else:
+                    temp = node.split(' ')
+                    temp = [int(x) for x in temp]
+                curr_D[room] = temp
+                room += 1
+            curr_D = convert_dictionary(curr_D)
+            
+        else:
+            continue
+       
+        if is_valid_solution(curr_D, G, s, k):
+            if calculate_happiness(curr_D, G) > best_H_so_far:
+                best_D_so_far = curr_D
+                best_k_so_far = k
+                best_H_so_far = calculate_happiness(curr_D, G)
+            #
+    # pass
+    return best_D_so_far, best_k_so_far
+
+def solve_stress(G, s):
+    """
+    Args:
+        G: networkx.Graph
+        s: stress_budget
+    Returns:
+        D: Dictionary mapping for student to breakout room r e.g. {0:2, 1:0, 2:1, 3:2}
+        k: Number of breakout rooms
+    """
+
+    # TODO: your code here!
+    best_D_so_far = {}
+    best_k_so_far = 1
+    best_H_so_far = 0.0
+    n = nx.number_of_nodes(G)
+    
+    for k in range(1, n + 1):
+        curr_D = {}
+        smax = s/k
+        G_stress = G.copy()
+        while nx.number_of_nodes(G_stress) > k:  
+            # sort edges by decreasing happiness
+            sorted_stress = sorted(G_stress.edges(data=True), key=lambda y: (y[2]["stress"], -y[2]["happiness"]), reverse=False)
+            if len(sorted_stress) == 0:
+                break
+            #need to merge nodes A and B
+            n1, n2, _ = sorted_stress[0]
+            if G_stress.nodes[n1].get("stress", 0) + G_stress.nodes[n2].get("stress", 0) + G_stress.edges[n1, n2]["stress"] <= smax:
+                merge(G_stress, n1, n2)
+                
+            else:
+                G_stress.remove_edge(n1,n2)
+                
+
+        if nx.number_of_nodes(G_happy) == k:
+            room = 0
+            for node in list(G_happy.nodes):
+                if isinstance(node, int):
+                    temp = [node]
+                else:
+                    temp = node.split(' ')
+                    temp = [int(x) for x in temp]
+                curr_D[room] = temp
+                room += 1
+            curr_D = convert_dictionary(curr_D)
+            
+        else:
+            continue
+       
+        if is_valid_solution(curr_D, G, s, k):
+            if calculate_happiness(curr_D, G) > best_H_so_far:
+                best_D_so_far = curr_D
+                best_k_so_far = k
+                best_H_so_far = calculate_happiness(curr_D, G)
+            #
+    # pass
+    return best_D_so_far, best_k_so_far
+
 def merge(G, n1, n2):
     
     neighbors = nx.common_neighbors(G, n1, n2)
