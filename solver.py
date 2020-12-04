@@ -68,30 +68,54 @@ def solve(G, s):
     # pass
     return best_D_so_far, best_k_so_far
 
-def solve_kinda(G,s,n=10):
+def solve_kinda(G,s,n=40):
     curMax = 0
     dMax, kMax = 0,0
-    for i in range(n):
-        print("ITERATION", i)
-        d1, k1 = solve_happy(G,s)
-        d2, k2 = solve_stress(G,s)
+    for i in range(15):
+        d1, k1 = solve_happy(G,s, 0.7)
+        d2, k2 = solve_stress(G,s, 0.7)
         h1 = calculate_happiness(d1, G)
         h2 = calculate_happiness(d2, G)
         if max(h1, h2) >  curMax:
-            print("NEW MAX YEY", max(h1, h2))
             if h1 > h2:
                 curMax = h1
                 dMax, kMax = d1, k1 
             else:
-                print("WOWOWOWOWOWOWOWOWOWOWWOW")
                 curMax = h2 
                 dMax, kMax = d2, k2
+
+    for i in range(15):
+        d1, k1 = solve_happy(G,s, 0.35)
+        d2, k2 = solve_stress(G,s, 0.35)
+        h1 = calculate_happiness(d1, G)
+        h2 = calculate_happiness(d2, G)
+        if max(h1, h2) >  curMax:
+            if h1 > h2:
+                curMax = h1
+                dMax, kMax = d1, k1 
+            else:
+                curMax = h2 
+                dMax, kMax = d2, k2
+
+    for i in range(15):
+        d1, k1 = solve_happy(G,s, 0.1)
+        d2, k2 = solve_stress(G,s, 0.1)
+        h1 = calculate_happiness(d1, G)
+        h2 = calculate_happiness(d2, G)
+        if max(h1, h2) >  curMax:
+            if h1 > h2:
+                curMax = h1
+                dMax, kMax = d1, k1 
+            else:
+                curMax = h2 
+                dMax, kMax = d2, k2
+                
     return dMax, kMax
 
 
 
 
-def solve_happy(G, s):
+def solve_happy(G, s, prob):
     """
     Args:
         G: networkx.Graph
@@ -112,7 +136,7 @@ def solve_happy(G, s):
         smax = s/k
         G_happy = G.copy()
         while nx.number_of_nodes(G_happy) > k:  
-            i = np.random.geometric(p=0.3, size = 1).item(0)
+            i = np.random.geometric(p=prob, size = 1).item(0)
             # sort edges by decreasing happiness
             sorted_happiness = sorted(G_happy.edges(data=True), key=lambda y: (y[2]["happiness"], -y[2]["stress"]), reverse=True)
             #i = random.randint(0, len(sorted_happiness))
@@ -152,7 +176,7 @@ def solve_happy(G, s):
     # pass
     return best_D_so_far, best_k_so_far
 
-def solve_stress(G, s):
+def solve_stress(G, s, prob):
     """
     Args:
         G: networkx.Graph
@@ -174,7 +198,7 @@ def solve_stress(G, s):
         G_stress = G.copy()
         while nx.number_of_nodes(G_stress) > k:  
             # sort edges by decreasing happiness
-            i = np.random.geometric(p=0.15, size = 1).item(0)
+            i = np.random.geometric(p=prob, size = 1).item(0)
             sorted_stress = sorted(G_stress.edges(data=True), key=lambda y: (y[2]["stress"], -y[2]["happiness"]), reverse=False)
             if len(sorted_stress) == 0:
                 break
@@ -279,7 +303,7 @@ if __name__ == '__main__':
     for input_path in inputs:
         output_path = 'andrewbigouts/' + basename(normpath(input_path))[:-3] + '.out'
         G, s = read_input_file(input_path, 100)
-        D, k = solve_kinda(G, s, 20)
+        D, k = solve_kinda(G, s)
         assert is_valid_solution(D, G, s, k)
         #cost_t = calculate_happiness(T)
         write_output_file(D, output_path)
