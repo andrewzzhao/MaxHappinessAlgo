@@ -5,6 +5,9 @@ from parse import read_input_file, write_output_file, read_output_file
 from utils import is_valid_solution, calculate_happiness, convert_dictionary
 from operator import itemgetter
 import sys
+import glob
+import os
+from os.path import basename, normpath
 
 
 def solve(G, s):
@@ -109,7 +112,7 @@ def solve_happy(G, s):
         smax = s/k
         G_happy = G.copy()
         while nx.number_of_nodes(G_happy) > k:  
-            i = np.random.geometric(p=0.10, size = 1).item(0)
+            i = np.random.geometric(p=0.3, size = 1).item(0)
             # sort edges by decreasing happiness
             sorted_happiness = sorted(G_happy.edges(data=True), key=lambda y: (y[2]["happiness"], -y[2]["stress"]), reverse=True)
             #i = random.randint(0, len(sorted_happiness))
@@ -171,7 +174,7 @@ def solve_stress(G, s):
         G_stress = G.copy()
         while nx.number_of_nodes(G_stress) > k:  
             # sort edges by decreasing happiness
-            i = np.random.geometric(p=0.2, size = 1).item(0)
+            i = np.random.geometric(p=0.15, size = 1).item(0)
             sorted_stress = sorted(G_stress.edges(data=True), key=lambda y: (y[2]["stress"], -y[2]["happiness"]), reverse=False)
             if len(sorted_stress) == 0:
                 break
@@ -257,25 +260,26 @@ def merge(G, n1, n2):
 
 # Usage: python3 solver.py test.in
 
+"""
 if __name__ == '__main__':
     assert len(sys.argv) == 2
     path = sys.argv[1]
     G, s = read_input_file(path)
-    D, k = solve_kinda(G, s, 100)
+    D, k = solve_kinda(G, s, 300)
     assert is_valid_solution(D, G, s, k)
     print(D)
     print(k)
     print("Total Happiness: {}".format(calculate_happiness(D, G)))
-    write_output_file(D, 'backup/50.out')
-
+    write_output_file(D, 'results')
+"""
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
-# if __name__ == '__main__':
-#     inputs = glob.glob('file_path/inputs/*')
-#     for input_path in inputs:
-#         output_path = 'file_path/outputs/' + basename(normpath(input_path))[:-3] + '.out'
-#         G, s = read_input_file(input_path, 100)
-#         D, k = solve(G, s)
-#         assert is_valid_solution(D, G, s, k)
-#         cost_t = calculate_happiness(T)
-#         write_output_file(D, output_path)
+if __name__ == '__main__':
+    inputs = glob.glob('andrewbigins/*')
+    for input_path in inputs:
+        output_path = 'andrewbigouts/' + basename(normpath(input_path))[:-3] + '.out'
+        G, s = read_input_file(input_path, 100)
+        D, k = solve_kinda(G, s, 20)
+        assert is_valid_solution(D, G, s, k)
+        #cost_t = calculate_happiness(T)
+        write_output_file(D, output_path)
